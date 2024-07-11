@@ -1,2 +1,2 @@
 # Calendar-Server
-Calnder server written in C on linux, 3 diffrent implmentations, multithreaded, multiproccess, and single thread select based approach.
+Calender server written in C on Linux, 3 different implementations, multithreaded, multiprocess, and single thread select-based approach.
