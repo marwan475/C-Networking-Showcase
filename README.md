@@ -15,8 +15,6 @@ run the server on one terminal/machine
 
 run ./testing.bash hostname port
 
-get version 2 and getall only return number of events 
-
 check bash script for argument examples
 
 ## Client Server design
