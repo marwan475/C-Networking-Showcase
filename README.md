@@ -196,3 +196,177 @@ to the client and not store the new event
 
 - on every request to the server, the server will check if the end-time
 is in the past, if it is it will clear the database
+
+## Calender server client communication protocol
+
+### Version 2.1
+
+how the calender server and client will communicate, packet format and message types.
+
+### Packet Format
+
+- size 64 bytes
+### HEADER
+- 14 bytes
+- first 14 bytes are for header info
+- first 13 bytes of header is for username of client
+- byte 14 is for msgtype or status depending on sender
+- each msgtype and status has its own corisponding int code
+### DATA
+- 50 bytes
+- Atributes are 10 bytes each
+- max 5 atributes
+- server will read Attributes based on msgtype 
+
+### Int codes
+
+- empty/null = 0
+- success = 1
+- add = 2
+- remove = 3
+- update = 4
+- get = 5
+- getall = 6
+- error = 7
+- not found = 8
+
+### Data Format
+
+- each attribute has 10 bytes
+- max 10 bytes per attribute for client packets
+- server has 50 bytes to send response
+- date, first byte is month, second byte is day, third byte is year
+- time, first byte is hour, second byte is minutes (24 hour clock)
+- Event title, 10 bytes, each byte rperesents a letter, max 10 char title
+- Server has 50 bytes to send any raw data
+
+### Messages
+
+*server will read attributes in the order listed for msg
+*client will read Data starting at first byte of DATA (byte 15)
+
+*client will use DATA to send attributes
+*server will use DATA to send requested data
+*server will use DATA to comunicate errors
+*server sends username of client in header, client uses this to ensure
+it is the correct reciever of the packet
+
+### Add-Event-Msg:
+
+	Function: Add event to calender for user
+
+	Attributes: 
+		msgtype = add 
+		date: date of the event
+		start-time: start time of event
+		end-time: end time of event
+		Event-title: name of event
+	Request:
+		client sends request to server to add event to 
+		personal calender
+	Response:
+		server sends a response if operation was successful
+		or if there was a failure
+ 
+### Remove-Event-Msg:
+
+        Function: Remove event from calender for user 
+
+        Attributes:
+		msgtype = remove
+		date: date of the event
+                start-time: start time of event
+        Request:
+		client sends request to server to remove event from
+		personal calender
+        Response:
+		server sends a response if event exist or not and 
+		if operation was successful
+
+### Update-Event-Msg:
+
+        Function: Update an existing event from the calender of the user
+
+        Attributes:
+		msgtype = update
+                date: date of the event
+                start-time: start time of event
+                end-time: end time of event
+                Event-title: name of event
+        Request:
+		client sends request to server to update event from
+		personal calender, ethier the end time or event type
+		has to be diffrent
+        Response:
+		server sends a response if operation was successful
+		or if there was a failure such as event not existing
+
+### Get-Event1-Msg:
+
+        Function: Gets the event type of the event requested
+
+        Attributes:
+		msgtype = get
+		date: date of event
+		time: start time of event
+        Request:
+		client sends request to get and event type given the
+		date and start time of that event
+        Response:
+		server sends a response containing the event type if
+		the event exist, if not it will send an error
+### Get-Event2-Msg:
+
+        Function: gets all event types of the day
+
+        Attributes:
+		msgtype = get
+		date: date of event
+        Request:
+		client sends a request to get the event types of all
+		events on the given day
+        Response:
+		server sends a response with all the number of
+	        events on that day if any exist, if not then the
+		server sends a 0
+
+### GetAll-Events-Msg:
+
+        Function: 
+		first get the number of events for the user, if
+		it is non zero the client requests each event 
+		individually with 2 second delay 
+        Attributes:
+		msgtype = getall
+        Request:
+		client sends request for all events, then sends 
+		individual requests for each event
+        Response:
+		server sends response containing number of events,
+		then fufils each individual request, if no events then
+		server sends 0
+			
+### Examples
+
+	client wants to add event birthday
+	april 22 2024, 16:00 - 18:30
+
+        Client request packet
+                HEADER
+                - username (13 bytes)
+                - 2 (1 byte)
+                DATA
+                -4(1byte),22(1byte),24(1byte)(7bytes empty)
+		-16(1byte),0(1byte)(8bytes empty)
+		-18(1byte),30(1byte)(8bytes empty)
+		-birthday(8bytes)(2bytes empty)
+
+
+	server responds with success
+
+	Server response packet
+		HEADER
+		- username of client (13 bytes)
+		- 1 (1 byte)
+		DATA
+		- 50bytes empty
