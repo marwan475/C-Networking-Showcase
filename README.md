@@ -1,6 +1,8 @@
 # C-Networking-Showcase
 Calendar server written in C on Linux, Makefile includes multiple CPU architectures, 3 different implementations, multithreaded, multiprocess, and single thread select-based approach.
 
+## How to run
+
 running make wil create 3 servers
 
 ./server_Approach port
@@ -17,14 +19,13 @@ get version 2 and getall only return number of events
 
 check bash script for argument examples
 
-Client Server design
+## Client Server design
 
-Version 1.4
+### Version 1.4
 
-this document will explain the design for the client
-and 3 types of servers
+design for the client and 3 types of servers
 
-Connection requirments
+### Connection requirments
 
 Client:
         -server machine hostname
@@ -44,7 +45,7 @@ General:
         -All requests are sent by client
         -All responses are handled/sent by server
 
-Client Design
+### Client Design
 
 - CMD input format
 	hostname:
@@ -90,7 +91,7 @@ format defined in the communication protocol
 - Client will print response output
 - Client will close connection
 
-Server Design
+### Server Design
 
 - Server will take command line arguments and check validity
 - Argument format: port
@@ -109,7 +110,7 @@ requested
 -once a connection is recieved it will be sent to handle_con function
 -each implmentation will handle this connection diferently 
 
-Operations:
+### Operations:
 
 - add
 	- adds event to user list, if user struct doesnt exist
@@ -131,7 +132,7 @@ Operations:
 	from client
 	
 
-Database:
+### Database:
 -array of User structures
 -Only one connection can access data base at time
 -syncronization will be handled using semaphores
@@ -140,7 +141,7 @@ Database:
 -1024 is max amount of files a proc can open in linux
 -max open connections is 1024
 
-Structs:
+### Structs:
 - User struct will contain user info
 	- username
 	- list of events
@@ -150,7 +151,7 @@ Structs:
 	-start time
 	-end time
 
-Approach Based:
+### Approach Based:
 
 - single thread
 - thread will be an infinite loop
@@ -164,7 +165,7 @@ calling select on each one
 - connection socket will be removed once connection is lost
 - since it is a single thread prog, sync is handled for us
 
-Multi-Threaded:
+### Multi-Threaded:
 
 - main thread will accept connections
 - every new connection socket will be added to list
@@ -175,7 +176,7 @@ with database
 - threads will be synced using a mutex only one thread can access DB at
 a time
 
-Multi-Process:
+### Multi-Process:
 
 - main proccess will accept connections
 - every new connection will fork a child proc
@@ -187,6 +188,8 @@ Multi-Process:
 - child will be killed after connection is killed
 - parent proc will control access to DB ensuring only one proc accesses it
 at a time
+
+### Bonus features
 
 - if there is a conflict in events the server will send a msg
 to the client and not store the new event
